@@ -35,8 +35,8 @@ export default function Navbar() {
             </span>
           </Link>
           
-          {/* Navigation Items (Visible on Desktop and Mobile Header as requested) */}
-          <div className="flex items-center gap-4 md:gap-6 overflow-x-auto no-scrollbar">
+          {/* Navigation Items */}
+          <div className="flex items-center gap-4 md:gap-6">
             {navItems.filter(item => item.path !== "/").map((item) => {
               // Exact match for active state
               const isActive = pathname === item.path.split('?')[0];
