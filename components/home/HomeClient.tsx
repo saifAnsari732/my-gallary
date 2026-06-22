@@ -123,6 +123,8 @@ export default function HomeClient({ children }: { children?: React.ReactNode })
       {/* SERVER COMPONENT SLOT (RecentUploads) */}
       {children}
 
+      {/* INSTAGRAM REELS SECTION removed */}
+
       {/* CTA SECTION */}
       <section className="relative rounded-3xl overflow-hidden p-16 text-center border border-primary-500/20">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-secondary-600/20 backdrop-blur-xl" />

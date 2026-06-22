@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Image as ImageIcon, Home, Lock, ShieldAlert, Eye, EyeOff, LogIn } from "lucide-react";
+import { Upload, Image as ImageIcon, Home, Lock, ShieldAlert, Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import ProfileAvatar from "./ProfileAvatar";
 
 const navItems = [
   { path: "/", label: "Home", icon: Home },
   { path: "/gallery", label: "Gallery", icon: ImageIcon },
   { path: "/upload", label: "Upload", icon: Upload },
   { path: "/upload?bulk=true", label: "Bulk Upload", icon: Upload },
+  { path: "/admin", label: "Admin", icon: Shield },
 ];
 
 const ADMIN_PASSWORD = "hasan@123";
@@ -50,7 +51,7 @@ export default function Navbar() {
   };
 
   const visibleNavItems = navItems.filter(item => {
-    if (!isLoggedIn && item.path.includes("/upload")) return false;
+    if (!isLoggedIn && (item.path.includes("/upload") || item.path === "/admin")) return false;
     return true;
   });
 
@@ -62,13 +63,7 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050816]/80 backdrop-blur-lg border-b border-white/10 shadow-lg shadow-black/50">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <Image 
-              src="/logo.svg" 
-              alt="Hasan Pic Logo" 
-              width={32} 
-              height={32} 
-              className="w-8 h-8 rounded-full transform group-hover:scale-110 transition-transform" 
-            />
+            <ProfileAvatar />
             <span className="font-bold text-lg tracking-wide text-foreground">
               Hasan Pic
             </span>
