@@ -13,7 +13,7 @@ export default function ProfileAvatar() {
   const [uploading, setUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  
 
   useEffect(() => {
     setMounted(true);
@@ -32,6 +32,7 @@ export default function ProfileAvatar() {
   }, [showMenu]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("ProfileAvatar: handleFileSelect fired", e?.target?.files?.[0]);
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -89,7 +90,8 @@ export default function ProfileAvatar() {
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setShowMenu(!showMenu)}
+        type="button"
+        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowMenu(!showMenu); }}
         disabled={uploading}
         className="relative group shrink-0"
         title="Profile"
@@ -98,17 +100,17 @@ export default function ProfileAvatar() {
           <Image
             src={profilePic}
             alt="Profile"
-            width={32}
-            height={32}
-            className="w-8 h-8 rounded-full object-cover transform group-hover:scale-110 transition-transform ring-2 ring-white/10 group-hover:ring-primary-500/50"
+            width={36}
+            height={36}
+            className="w-12 h-12 rounded-full object-cover transform group-hover:scale-110 transition-transform ring-2 ring-white/10 group-hover:ring-primary-500/50"
           />
         ) : (
           <Image
             src="/logo.svg"
             alt="Hasan Pic Logo"
-            width={32}
-            height={32}
-            className="w-8 h-8 rounded-full transform group-hover:scale-110 transition-transform"
+            width={36}
+            height={36}
+            className="w-12 h-12 rounded-full transform group-hover:scale-110 transition-transform"
           />
         )}
         <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -121,29 +123,32 @@ export default function ProfileAvatar() {
       </button>
 
       <input
-        ref={inputRef}
+        id="profile-upload"
         type="file"
         accept="image/*"
-        className="hidden"
+        className="sr-only"
+        onClick={() => console.log('ProfileAvatar: input clicked')}
         onChange={handleFileSelect}
       />
 
       <AnimatePresence>
-        {showMenu && (
+          {showMenu && (
           <motion.div
+            onClick={(e) => e.stopPropagation()}
             initial={{ opacity: 0, scale: 0.9, y: -5 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -5 }}
             transition={{ duration: 0.15 }}
             className="absolute left-0 top-full mt-2 w-48 bg-[#0B1120] border border-white/10 rounded-2xl p-2 shadow-2xl shadow-black/60 z-[200]"
           >
-            <button
-              onClick={() => { inputRef.current?.click(); }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-white hover:bg-white/5 transition-colors"
+            <label
+                htmlFor="profile-upload"
+                onClick={() => console.log('ProfileAvatar: label clicked')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               Upload Photo
-            </button>
+            </label>
             {profilePic && (
               <button
                 onClick={handleRemove}
