@@ -28,8 +28,21 @@ export default function AdminPage() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("hasan_profile_pic");
-    if (stored) setProfilePic(stored);
+
+    async function loadProfilePic() {
+      try {
+        const res = await fetch("/api/profile");
+        const data = await res.json();
+        if (data?.avatarUrl) {
+          setProfilePic(data.avatarUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load profile pic", error);
+      }
+    }
+
+    loadProfilePic();
+
     const loggedIn = localStorage.getItem("hasan_logged_in");
     if (loggedIn === "true") {
       setIsLoggedIn(true);
@@ -58,7 +71,11 @@ export default function AdminPage() {
       const uploadRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", { method: "POST", body: formData });
       if (!uploadRes.ok) throw new Error("Upload failed");
       const uploadData = await uploadRes.json();
-      localStorage.setItem("hasan_profile_pic", uploadData.url);
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: uploadData.url }),
+      });
       setProfilePic(uploadData.url);
     } catch (error) {
       console.error(error);

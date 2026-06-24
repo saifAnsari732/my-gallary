@@ -5,8 +5,6 @@ import Image from "next/image";
 import { Camera, Upload, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const STORAGE_KEY = "hasan_profile_pic";
-
 export default function ProfileAvatar() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -17,8 +15,20 @@ export default function ProfileAvatar() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) setProfilePic(stored);
+
+    async function loadProfileAvatar() {
+      try {
+        const res = await fetch("/api/profile");
+        const data = await res.json();
+        if (data?.avatarUrl) {
+          setProfilePic(data.avatarUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load profile avatar", error);
+      }
+    }
+
+    loadProfileAvatar();
   }, []);
 
   useEffect(() => {
@@ -64,8 +74,12 @@ export default function ProfileAvatar() {
       if (!uploadRes.ok) throw new Error("Upload failed");
 
       const uploadData = await uploadRes.json();
-      localStorage.setItem(STORAGE_KEY, uploadData.url);
       setProfilePic(uploadData.url);
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: uploadData.url }),
+      });
       setShowMenu(false);
     } catch (error) {
       console.error(error);
@@ -75,8 +89,16 @@ export default function ProfileAvatar() {
     }
   };
 
-  const handleRemove = () => {
-    localStorage.removeItem(STORAGE_KEY);
+  const handleRemove = async () => {
+    try {
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: null }),
+      });
+    } catch (error) {
+      console.error("Failed to remove profile avatar", error);
+    }
     setProfilePic(null);
     setShowMenu(false);
   };
