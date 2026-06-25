@@ -12,7 +12,7 @@ const navItems = [
   { path: "/", label: "Home", icon: Home },
   { path: "/gallery", label: "Gallery", icon: ImageIcon },
   { path: "/upload", label: "Upload", icon: Upload },
-  { path: "/upload?bulk=true", label: "Bulk Upload", icon: Upload },
+  // { path: "/upload?bulk=true", label: "Bulk Upload", icon: Upload },
   { path: "/admin", label: "Admin", icon: Shield },
 ];
 
@@ -79,7 +79,7 @@ export default function Navbar() {
           </div>
           
           {/* Navigation Items */}
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-2 md:gap-6">
             {topNavItems.map((item) => {
               // Exact match for active state
               const isActive = pathname === item.path.split('?')[0];
