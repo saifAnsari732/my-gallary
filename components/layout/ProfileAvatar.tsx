@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function ProfileAvatar() {
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -15,6 +16,7 @@ export default function ProfileAvatar() {
 
   useEffect(() => {
     setMounted(true);
+    setIsLoggedIn(localStorage.getItem("hasan_logged_in") === "true");
 
     async function loadProfileAvatar() {
       try {
@@ -28,7 +30,14 @@ export default function ProfileAvatar() {
       }
     }
 
+    const handleLogin = () => setIsLoggedIn(true);
+    window.addEventListener("hasan-login", handleLogin);
+
     loadProfileAvatar();
+
+    return () => {
+      window.removeEventListener("hasan-login", handleLogin);
+    };
   }, []);
 
   useEffect(() => {
@@ -90,16 +99,17 @@ export default function ProfileAvatar() {
   };
 
   const handleRemove = async () => {
+    if (!isLoggedIn) return;
     try {
       await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatarUrl: null }),
       });
+      setProfilePic(null);
     } catch (error) {
       console.error("Failed to remove profile avatar", error);
     }
-    setProfilePic(null);
     setShowMenu(false);
   };
 
@@ -113,10 +123,15 @@ export default function ProfileAvatar() {
     <div className="relative" ref={menuRef}>
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowMenu(!showMenu); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (!isLoggedIn) return;
+          setShowMenu(!showMenu);
+        }}
         disabled={uploading}
         className="relative group shrink-0"
-        title="Profile"
+        title={isLoggedIn ? "Profile" : "Admin login required"}
       >
         {profilePic ? (
           <Image
@@ -163,15 +178,21 @@ export default function ProfileAvatar() {
             transition={{ duration: 0.15 }}
             className="absolute left-0 top-full mt-2 w-48 bg-[#0B1120] border border-white/10 rounded-2xl p-2 shadow-2xl shadow-black/60 z-[200]"
           >
-            <label
+            {isLoggedIn ? (
+              <label
                 htmlFor="profile-upload"
                 onClick={() => console.log('ProfileAvatar: label clicked')}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-            >
-              <Upload className="w-4 h-4" />
-              Upload Photo
-            </label>
-            {profilePic && (
+              >
+                <Upload className="w-4 h-4" />
+                Upload Photo
+              </label>
+            ) : (
+              <div className="w-full px-3 py-2.5 rounded-xl text-sm text-muted bg-white/5 text-center">
+                Admin login required
+              </div>
+            )}
+            {isLoggedIn && profilePic && (
               <button
                 onClick={handleRemove}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"

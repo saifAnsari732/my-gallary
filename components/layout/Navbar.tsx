@@ -38,6 +38,8 @@ export default function Navbar() {
     e?.preventDefault();
     if (passwordInput === ADMIN_PASSWORD) {
       localStorage.setItem("hasan_logged_in", "true");
+      document.cookie = "hasan_logged_in=true; path=/";
+      window.dispatchEvent(new Event("hasan-login"));
       setIsLoggedIn(true);
       setShowLoginModal(false);
       setPasswordInput("");
