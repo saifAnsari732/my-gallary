@@ -85,6 +85,24 @@ export default function AdminPage() {
     }
   };
 
+  const handleProfilePicDelete = async () => {
+    if (!confirm("Are you sure you want to delete the profile picture?")) return;
+    setUploadingPic(true);
+    try {
+      await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatarUrl: null }),
+      });
+      setProfilePic(null);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete profile picture.");
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
   const fetchDocuments = async () => {
     setLoading(true);
     try {
@@ -178,7 +196,19 @@ export default function AdminPage() {
           <h2 className="text-lg font-semibold">Profile Picture</h2>
           <p className="text-sm text-muted mt-1">Click the image to upload or change your profile picture.</p>
         </div>
-        <input ref={picInputRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePicUpload} />
+        <div className="flex flex-col items-end gap-2">
+          {profilePic && (
+            <button
+              onClick={handleProfilePicDelete}
+              disabled={uploadingPic}
+              className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-300 hover:bg-red-500/20 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          )}
+          <input ref={picInputRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePicUpload} />
+        </div>
       </motion.div>
 
       {loading ? (
