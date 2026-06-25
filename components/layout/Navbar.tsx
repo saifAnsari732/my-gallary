@@ -52,6 +52,13 @@ export default function Navbar() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("hasan_logged_in");
+    document.cookie = "hasan_logged_in=; path=/; max-age=0";
+    window.dispatchEvent(new Event("hasan-logout"));
+    setIsLoggedIn(false);
+  };
+
   const visibleNavItems = navItems.filter(item => {
     if (!isLoggedIn && (item.path.includes("/upload") || item.path === "/admin")) return false;
     return true;
@@ -95,13 +102,20 @@ export default function Navbar() {
               );
             })}
             
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <button 
                 onClick={() => setShowLoginModal(true)}
                 className="flex items-center gap-2 text-xs md:text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 px-4 py-2 rounded-full transition-colors"
               >
                 <LogIn className="w-4 h-4" />
                 Login
+              </button>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-xs md:text-sm font-medium text-white bg-red-500/90 hover:bg-red-500 px-4 py-2 rounded-full transition-colors"
+              >
+                Logout
               </button>
             )}
             

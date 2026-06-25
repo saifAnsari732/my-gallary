@@ -31,12 +31,19 @@ export default function ProfileAvatar() {
     }
 
     const handleLogin = () => setIsLoggedIn(true);
+    const handleLogout = () => {
+      setIsLoggedIn(false);
+      setShowMenu(false);
+    };
+
     window.addEventListener("hasan-login", handleLogin);
+    window.addEventListener("hasan-logout", handleLogout);
 
     loadProfileAvatar();
 
     return () => {
       window.removeEventListener("hasan-login", handleLogin);
+      window.removeEventListener("hasan-logout", handleLogout);
     };
   }, []);
 
